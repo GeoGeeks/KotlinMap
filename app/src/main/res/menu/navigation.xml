@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_cerca"
+        android:icon="@drawable/arcgisruntime_location_display_default_symbol"
+        android:title="@string/title_cerca" />
+
+    <item
+        android:id="@+id/navigation_buscar"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/title_buscar" />
+
+</menu>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">KotlinMap</string>
+    <string name="title_cerca">Cerca</string>
+    <string name="title_buscar">Buscar</string>
+</resources>
