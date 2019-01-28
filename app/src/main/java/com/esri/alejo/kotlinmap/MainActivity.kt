@@ -2,30 +2,48 @@ package com.esri.alejo.kotlinmap
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Point
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import com.esri.arcgisruntime.mapping.ArcGISMap
-import com.esri.arcgisruntime.mapping.Basemap
 import kotlinx.android.synthetic.main.activity_main.*
 import com.esri.arcgisruntime.mapping.view.LocationDisplay
-import android.widget.Toast
 import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
+import com.esri.arcgisruntime.layers.FeatureLayer
+import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
+import com.esri.arcgisruntime.mapping.view.MapView
+import android.view.MotionEvent
+import android.widget.*
+import com.esri.arcgisruntime.data.Feature
+import com.esri.arcgisruntime.layers.LayerContent
+import java.util.concurrent.ExecutionException
+import com.koushikdutta.ion.Ion;
+import java.net.URLEncoder
+
 
 class MainActivity : AppCompatActivity(){
     var pos = 0
     var locationDisplay: LocationDisplay? = null
+    var lblCategoria: TextView? = null
+    var lugarNombre: TextView? = null
+    var direccionLugar: TextView? = null
+    var fotoLugar: ImageView? = null
+    var btnTelefono: Button? = null
+    var btnWhatsapp: ImageButton? = null
+
     private var mbut: ImageButton? = null
     //var view: View? = null
     private val requestCode = 2
+    var map: ArcGISMap? = null
 
     internal var reqPermissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
-            .ACCESS_COARSE_LOCATION)
+            .ACCESS_COARSE_LOCATION,Manifest.permission.CALL_PHONE )
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -46,13 +64,23 @@ class MainActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //myLocationButton.setOnClickListener(View.OnClickListener {
-        //    geoLocalizacion()
-        //})
+        closePopup.setOnClickListener{
+            contentPopup?.visibility = View.GONE
+        }
+        //btnTelefono?.text = "573107746702"
+        //btnTelefono?.setOnClickListener {
+            //llamar al telefono
+        //    callToNumber(btnTelefono?.text.toString())
+        //}
+        //btnWhatsapp.setOnClickListener{
+            //dispara whatsapp
+        //    sendMessageToWhatsAppContact("573107746702");
+        //}
         mbut = findViewById(R.id.myLocationButton) as ImageButton
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         // create a map with the BasemapType topographic
-        val map = ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100, -74.0817500, 16)
+        map = ArcGISMap("http://geogeeks2.maps.arcgis.com/home/item.html?id=b120d5eeb44448e9a43f508850caa890")
+        //val map = ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100, -74.0817500, 16)
         // set the map to be displayed in the layout's MapView
         mapView2!!.map = map
         // get the MapView's LocationDisplay
@@ -131,6 +159,9 @@ class MainActivity : AppCompatActivity(){
                 }
                 Toast.makeText(this@MainActivity, "You clicked me. on "+pos, Toast.LENGTH_SHORT).show()
             }
+        
+            //mapView2.setOnTouchListener(new IdentifyFeatureLayerTouchListener(view.getContext(), vistaMap))
+            mapView2.setOnTouchListener(IdentifyFeatureLayerTouchListener(this.applicationContext,mapView2))
         }
         override fun onPause() {
             super.onPause()
@@ -163,6 +194,135 @@ class MainActivity : AppCompatActivity(){
                 Toast.makeText(this@MainActivity, resources.getString(R.string.abc_action_bar_home_description), Toast
                         .LENGTH_SHORT).show()
                 // Update UI to reflect that the location display did not actually start
+            }
+        }
+
+        class IdentifyFeatureLayerTouchListener(context: Context?, mapView: MapView?) : DefaultMapViewOnTouchListener(context, mapView) {
+            private val layer: FeatureLayer? = null // reference to the layer to identify features in
+
+            // override the onSingleTapConfirmed gesture to handle a single tap on the MapView
+            override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+                // get the screen point where user tapped
+                val screenPoint = Point(e!!.x.toInt(), e!!.y.toInt())
+                val identifyFuture = super.mMapView.identifyLayersAsync(screenPoint, 5.0,
+                        false)
+
+                // add a listener to the future
+                identifyFuture.addDoneListener {
+                    try {
+                        // get the identify results from the future - returns when the operation is complete
+                        val identifyLayersResults = identifyFuture.get()
+
+                        // iterate all the layers in the identify result
+                        for (identifyLayerResult in identifyLayersResults) {
+
+                            // each identified layer should find only one or zero results, when identifying topmost GeoElement only
+                            if (identifyLayerResult.elements.size > 0) {
+                                val topmostElement = identifyLayerResult.elements[0]
+                                if (topmostElement is Feature) {
+                                    val identifiedFeature = topmostElement as Feature
+
+                                    // Use feature as required, for example access attributes or geometry, select, build a table, etc...
+                                    MainActivity().processIdentifyFeatureResult(identifiedFeature, identifyLayerResult.layerContent)
+                                }
+                            }
+                        }
+                    } catch (ex: InterruptedException) {
+                        //dealWithException(ex); // must deal with exceptions thrown from the async identify operation
+                    } catch (ex: ExecutionException) {
+                    }
+                }
+                return super.onSingleTapConfirmed(e)
+            }
+        }
+
+        private fun mostrarPopup(categoriaNombre: String?, nombre: String?, direccion: String?, telefono: String?){
+
+            //Log.e(MainActivity.TAG, nombre+", "+direccion+", "+foto);
+            lblCategoria?.text = categoriaNombre
+            lugarNombre?.text = nombre
+            direccionLugar?.text = direccion
+            btnTelefono?.text = telefono
+            //if(foto != null){
+            //        Ion.with(fotoLugar).load(foto)
+            //}else{
+            //    Ion.with(fotoLugar).load("http://geoapps.esri.co/recursos/CCU2017/bogota.jpg")
+            //}
+            ///disparar Whatsapp
+            btnWhatsapp?.setOnClickListener{
+                //dispara whatsapp
+                println("wp:"+telefono)
+                sendMessageToWhatsAppContact("57"+telefono!!)
+            }
+            ///disparar llamada a celular
+            btnTelefono?.setOnClickListener {
+                //llamar al telefono
+                println("llamar:"+telefono)
+                callToNumber("57"+btnTelefono!!.text.toString())
+            }
+            contentPopup?.visibility = View.VISIBLE
+            //popup.setVisibility(View.VISIBLE)
+        }
+
+        fun processIdentifyFeatureResult(feature: Feature?, content: LayerContent?){
+            var nombre: String?
+            var direccion: String?
+            var foto: String?
+            var telefono: String?
+            //valores para obtener de la capa
+            val ensayadero = "Nombre"
+            val dir = "Dirección"
+            val fot = "Foto"
+            val tel = "Telefono"
+            when (content?.name){
+                "Ensayaderos" -> {
+                    nombre = feature?.attributes!!.get(ensayadero).toString()
+                    direccion = feature?.attributes!!.get(dir).toString()
+                    telefono = feature?.attributes!!.get(tel).toString()
+                    foto = feature?.attributes!!.get(fot).toString()
+                    println(nombre + ':' + direccion + ':' + telefono + ':')
+                    mostrarPopup("Ensayadero", nombre, direccion, telefono)
+                }
+                "TiendaMusica" ->{
+                    nombre = feature?.attributes!!.get(ensayadero).toString()
+                    direccion = feature?.attributes!!.get(dir).toString()
+                    telefono = feature?.attributes!!.get(tel).toString()
+                    foto = feature?.attributes!!.get(fot).toString()
+                    mostrarPopup("Tienda de Música", nombre, direccion, telefono)
+                }
+            }
+        }
+
+        private fun sendMessageToWhatsAppContact(number: String) {
+            val packageManager = this.getPackageManager()
+            val i = Intent(Intent.ACTION_VIEW)
+            try {
+                val url = "https://api.whatsapp.com/send?phone=" + number + "&text=" + URLEncoder.encode("holas", "UTF-8")
+                i.setPackage("com.whatsapp")
+                i.data = Uri.parse(url)
+                if (i.resolveActivity(packageManager) != null) {
+                    this.startActivity(i)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+
+        private fun callToNumber(number: String){
+            // If an error is found, handle the failure to start.
+            // Check permissions to see if failure may be due to lack of permissions.
+            val permissionCheck3 = ContextCompat.checkSelfPermission(this@MainActivity, reqPermissions[2]) ==
+                    PackageManager.PERMISSION_GRANTED
+
+            if (!(permissionCheck3)) {
+                // If permissions are not already granted, request permission from the user.
+                ActivityCompat.requestPermissions(this@MainActivity, reqPermissions, requestCode)
+
+            } else {
+                val intent = Intent(Intent.ACTION_CALL)
+                intent.data = Uri.parse("tel:$number")
+                this.startActivity(intent)
             }
         }
     }
