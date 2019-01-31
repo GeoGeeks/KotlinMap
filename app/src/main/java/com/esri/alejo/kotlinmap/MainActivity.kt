@@ -30,22 +30,30 @@ import java.net.URLEncoder
 class MainActivity : AppCompatActivity(){
     var pos = 0
     var locationDisplay: LocationDisplay? = null
-    var lblCategoria: TextView? = null
-    var lugarNombre: TextView? = null
-    var direccionLugar: TextView? = null
-    var fotoLugar: ImageView? = null
-    var btnTelefono: Button? = null
-    var btnWhatsapp: ImageButton? = null
+  //  var lblCategoria: TextView? = null
+   // val lugarNb: TextView? = null
+    //var direccionLugar: TextView? = null
+    //var fotoLugar: ImageView? = null
 
+    //var cont: LinearLayout? = null
     private var mbut: ImageButton? = null
     //var view: View? = null
     private val requestCode = 2
     var map: ArcGISMap? = null
 
+
+
+    var nombre: String? = null
+    var direccion: String? = null
+    var foto: String?= null
+    var telefono: String? = null
+
+
+
     internal var reqPermissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
             .ACCESS_COARSE_LOCATION,Manifest.permission.CALL_PHONE )
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+ /*   private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_cerca -> {
                 println("cerca")
@@ -61,12 +69,41 @@ class MainActivity : AppCompatActivity(){
         false
     }
 
+*/
+    public class Example {
+
+      //  val lugarNb: TextView? = findViewById(R.id.lugarNombre) as TextView
+        companion object {
+
+
+          var lblCategoria: TextView? = null
+          var lugarNb: TextView? = null
+          var direccionLugar: TextView? = null
+          var fotoLugar: ImageView? = null
+
+          var cont: LinearLayout? = null
+
+          var btnTelefono: Button? = null
+          var btnWhatsapp: ImageButton? = null
+
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         closePopup.setOnClickListener{
-            contentPopup?.visibility = View.GONE
+            Example.cont?.visibility = View.GONE
         }
+        Example.lugarNb= findViewById(R.id.lugarNombre) as TextView
+        Example.direccionLugar= findViewById(R.id.direccionLugar) as TextView
+        Example.lblCategoria= findViewById(R.id.lblCategoria) as TextView
+        Example.btnTelefono = findViewById(R.id.btnTelefono) as Button
+        Example.btnWhatsapp = findViewById(R.id.btnWhatsapp) as ImageButton
+
+        //Example.lugarNb?.text = "Holas"
+        //Example.C_ID= "asd"
         //btnTelefono?.text = "573107746702"
         //btnTelefono?.setOnClickListener {
             //llamar al telefono
@@ -76,8 +113,21 @@ class MainActivity : AppCompatActivity(){
             //dispara whatsapp
         //    sendMessageToWhatsAppContact("573107746702");
         //}
+
+
+
         mbut = findViewById(R.id.myLocationButton) as ImageButton
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        Example.cont =findViewById(R.id.contentPopup) as LinearLayout
+        //lugarNb = findViewById(R.id.lugarNombre) as TextView
+
+      //  lugarNb?.text = "asdasd"
+    //    val str: String = lugarNb?.text.toString()
+
+      //  println("the value is $str")
+
+
+
+        //navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         // create a map with the BasemapType topographic
         map = ArcGISMap("http://geogeeks2.maps.arcgis.com/home/item.html?id=b120d5eeb44448e9a43f508850caa890")
         //val map = ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100, -74.0817500, 16)
@@ -116,22 +166,38 @@ class MainActivity : AppCompatActivity(){
             }
         })
 
+
+
             // Populate the list for the Location display options for the spinner's Adapter
             myLocationButton.setOnClickListener {
+               // cont?.visibility = View.VISIBLE
+              //  lugarNb!!.text= nombre
+
+
                 if (pos  >= 5){
                     pos = 0
                 }
                 pos ++
+
+
 
                 when (pos) {
                     0 ->
                         // Stop Location Display
                         if (locationDisplay!!.isStarted)
                             locationDisplay!!.stop()
+
                     1 ->
                         // Start Location Display
-                        if (!locationDisplay!!.isStarted)
+                        try{
+                        if (!locationDisplay!!.isStarted) {
                             locationDisplay!!.startAsync()
+                           // lugarNb?.text = "funcaAca"
+                           }
+                        }catch (e: Exception) {
+                         e.printStackTrace()
+                        }
+
                     2 -> {
                         // Re-Center MapView on Location
                         // AutoPanMode - Default: In this mode, the MapView attempts to keep the location symbol on-screen by
@@ -161,8 +227,29 @@ class MainActivity : AppCompatActivity(){
             }
         
             //mapView2.setOnTouchListener(new IdentifyFeatureLayerTouchListener(view.getContext(), vistaMap))
+
+
+
+
+
+
+
+
+
+
+
+
             mapView2.setOnTouchListener(IdentifyFeatureLayerTouchListener(this.applicationContext,mapView2))
-        }
+
+
+
+
+
+
+    }
+
+
+
         override fun onPause() {
             super.onPause()
             mapView2.pause()
@@ -181,8 +268,60 @@ class MainActivity : AppCompatActivity(){
             mapView2!!.dispose()
         }
 
+
+    public fun mostrarPopup(categoriaNombre: String, nombre: String, direccion: String, telefono: String){
+//        setContentView(R.layout.activity_main)
+       Example.cont?.visibility = View.VISIBLE
+        println("holas" + categoriaNombre + " d" +nombre)
+//        lblCategoria!!.text = categoriaNombre
+        //this.lugarNb!!.text = nombre
+        Example.lugarNb?.text = nombre
+        Example.lblCategoria?.text = categoriaNombre
+        Example.direccionLugar?.text = direccion
+
+
+
+
+
+
+       Example.btnTelefono?.text = "Llamar al: " + telefono
+
+//        if(foto != null){
+  //              Ion.with(fotoLugar).load(foto)
+    //    }else{
+      //      Ion.with(fotoLugar).load("http://geoapps.esri.co/recursos/CCU2017/bogota.jpg")
+        //}
+
+
+
+        ///disparar Whatsapp
+
+
+
+
+        btnWhatsapp?.setOnClickListener{
+            //dispara whatsapp
+            println("wp:"+telefono)
+            sendMessageToWhatsAppContact("57"+telefono!!)
+        }
+        ///disparar llamada a celular
+        btnTelefono?.setOnClickListener {
+            //llamar al telefono
+            println("llamar:"+telefono)
+            callToNumber("57"+btnTelefono!!.text.toString())
+        }
+
+
+
+        //this.cont?.visibility = View.VISIBLE
+        //popup.setVisibility(View.VISIBLE)
+
+    }
+
+
         override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
             // If request is cancelled, the result arrays are empty.
+
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Location permission was granted. This would have been triggered in response to failing to start the
                 // LocationDisplay, so try starting this again.
@@ -197,7 +336,12 @@ class MainActivity : AppCompatActivity(){
             }
         }
 
-        class IdentifyFeatureLayerTouchListener(context: Context?, mapView: MapView?) : DefaultMapViewOnTouchListener(context, mapView) {
+
+
+
+    ///////////////////////////////
+
+        public class IdentifyFeatureLayerTouchListener(context: Context?, mapView: MapView?) : DefaultMapViewOnTouchListener(context, mapView) {
             private val layer: FeatureLayer? = null // reference to the layer to identify features in
 
             // override the onSingleTapConfirmed gesture to handle a single tap on the MapView
@@ -221,108 +365,102 @@ class MainActivity : AppCompatActivity(){
                                 val topmostElement = identifyLayerResult.elements[0]
                                 if (topmostElement is Feature) {
                                     val identifiedFeature = topmostElement as Feature
-
+                                    try{
                                     // Use feature as required, for example access attributes or geometry, select, build a table, etc...
-                                    MainActivity().processIdentifyFeatureResult(identifiedFeature, identifyLayerResult.layerContent)
+
+                                        MainActivity().processIdentifyFeatureResult(identifiedFeature, identifyLayerResult.layerContent)
+
+
+
+                                    }catch (e : Exception){
+                                        e.printStackTrace()
+                                    }
                                 }
                             }
                         }
                     } catch (ex: InterruptedException) {
+                        ex.printStackTrace()
                         //dealWithException(ex); // must deal with exceptions thrown from the async identify operation
                     } catch (ex: ExecutionException) {
+                        ex.printStackTrace()
                     }
                 }
                 return super.onSingleTapConfirmed(e)
             }
+
+
+
         }
 
-        private fun mostrarPopup(categoriaNombre: String?, nombre: String?, direccion: String?, telefono: String?){
 
-            //Log.e(MainActivity.TAG, nombre+", "+direccion+", "+foto);
-            lblCategoria?.text = categoriaNombre
-            lugarNombre?.text = nombre
-            direccionLugar?.text = direccion
-            btnTelefono?.text = telefono
-            //if(foto != null){
-            //        Ion.with(fotoLugar).load(foto)
-            //}else{
-            //    Ion.with(fotoLugar).load("http://geoapps.esri.co/recursos/CCU2017/bogota.jpg")
-            //}
-            ///disparar Whatsapp
-            btnWhatsapp?.setOnClickListener{
-                //dispara whatsapp
-                println("wp:"+telefono)
-                sendMessageToWhatsAppContact("57"+telefono!!)
-            }
-            ///disparar llamada a celular
-            btnTelefono?.setOnClickListener {
-                //llamar al telefono
-                println("llamar:"+telefono)
-                callToNumber("57"+btnTelefono!!.text.toString())
-            }
-            contentPopup?.visibility = View.VISIBLE
-            //popup.setVisibility(View.VISIBLE)
-        }
 
-        fun processIdentifyFeatureResult(feature: Feature?, content: LayerContent?){
-            var nombre: String?
-            var direccion: String?
-            var foto: String?
-            var telefono: String?
+       public fun processIdentifyFeatureResult(feature: Feature?, content: LayerContent?){
+
+
+
             //valores para obtener de la capa
             val ensayadero = "Nombre"
             val dir = "Dirección"
             val fot = "Foto"
             val tel = "Telefono"
-            when (content?.name){
-                "Ensayaderos" -> {
-                    nombre = feature?.attributes!!.get(ensayadero).toString()
-                    direccion = feature?.attributes!!.get(dir).toString()
-                    telefono = feature?.attributes!!.get(tel).toString()
-                    foto = feature?.attributes!!.get(fot).toString()
-                    println(nombre + ':' + direccion + ':' + telefono + ':')
-                    mostrarPopup("Ensayadero", nombre, direccion, telefono)
-                }
-                "TiendaMusica" ->{
-                    nombre = feature?.attributes!!.get(ensayadero).toString()
-                    direccion = feature?.attributes!!.get(dir).toString()
-                    telefono = feature?.attributes!!.get(tel).toString()
-                    foto = feature?.attributes!!.get(fot).toString()
-                    mostrarPopup("Tienda de Música", nombre, direccion, telefono)
-                }
-            }
-        }
 
-        private fun sendMessageToWhatsAppContact(number: String) {
-            val packageManager = this.getPackageManager()
-            val i = Intent(Intent.ACTION_VIEW)
-            try {
-                val url = "https://api.whatsapp.com/send?phone=" + number + "&text=" + URLEncoder.encode("holas", "UTF-8")
-                i.setPackage("com.whatsapp")
-                i.data = Uri.parse(url)
-                if (i.resolveActivity(packageManager) != null) {
-                    this.startActivity(i)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+when (content?.name) {
 
-        }
+    "Ensayaderos" -> {
+        nombre = feature?.attributes!!.get(ensayadero).toString()
+        direccion = feature?.attributes!!.get(dir).toString()
+        telefono = feature?.attributes!!.get(tel).toString()
+        foto = feature?.attributes!!.get(fot).toString()
+        println(nombre + ':' + direccion + ':' + telefono + ':')
+        MainActivity().mostrarPopup("Ensayadero", nombre!!,direccion!!, telefono!!)
 
-        private fun callToNumber(number: String){
-            // If an error is found, handle the failure to start.
-            // Check permissions to see if failure may be due to lack of permissions.
-            val permissionCheck3 = ContextCompat.checkSelfPermission(this@MainActivity, reqPermissions[2]) ==
-                    PackageManager.PERMISSION_GRANTED
 
-            if (!(permissionCheck3)) {
-                // If permissions are not already granted, request permission from the user.
-                ActivityCompat.requestPermissions(this@MainActivity, reqPermissions, requestCode)
-
-            } else {
-                val intent = Intent(Intent.ACTION_CALL)
-                intent.data = Uri.parse("tel:$number")
-                this.startActivity(intent)
-            }
-        }
     }
+
+"TiendaMusica" ->{
+   nombre = feature?.attributes!!.get(ensayadero).toString()
+   direccion = feature?.attributes!!.get(dir).toString()
+   telefono = feature?.attributes!!.get(tel).toString()
+   foto = feature?.attributes!!.get(fot).toString()
+   MainActivity().mostrarPopup("Tienda de Música", nombre!!, direccion!!, telefono!!)
+}
+}
+
+
+
+}
+
+
+private fun sendMessageToWhatsAppContact(number: String) {
+val packageManager = this.getPackageManager()
+val i = Intent(Intent.ACTION_VIEW)
+try {
+val url = "https://api.whatsapp.com/send?phone=" + number + "&text=" + URLEncoder.encode("holas", "UTF-8")
+i.setPackage("com.whatsapp")
+i.data = Uri.parse(url)
+if (i.resolveActivity(packageManager) != null) {
+   this.startActivity(i)
+}
+} catch (e: Exception) {
+e.printStackTrace()
+}
+
+}
+
+private fun callToNumber(number: String){
+// If an error is found, handle the failure to start.
+// Check permissions to see if failure may be due to lack of permissions.
+val permissionCheck3 = ContextCompat.checkSelfPermission(this@MainActivity, reqPermissions[2]) ==
+   PackageManager.PERMISSION_GRANTED
+
+if (!(permissionCheck3)) {
+// If permissions are not already granted, request permission from the user.
+ActivityCompat.requestPermissions(this@MainActivity, reqPermissions, requestCode)
+
+} else {
+val intent = Intent(Intent.ACTION_CALL)
+intent.data = Uri.parse("tel:$number")
+this.startActivity(intent)
+}
+}
+}
