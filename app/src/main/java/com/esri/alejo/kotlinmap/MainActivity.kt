@@ -170,8 +170,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        // get the MapView's LocationDisplay
-        println("sigue derecho 2")
 
         btnEnsayaderos!!.setOnClickListener {
             println("ensayaderos apagar")
@@ -181,6 +179,18 @@ class MainActivity : AppCompatActivity() {
         btnTiendasMusica!!.setOnClickListener {
             println("apagar tiendas de musica")
             activarDesactivaLayer(Example.tiendasMusica!!, btnTiendasMusica)
+        }
+
+        Example.btnWhatsapp?.setOnClickListener {
+            //dispara whatsapp
+            println("wp:" + Example.btnTelefono!!.text.toString())
+            sendMessageToWhatsAppContact("57" + Example.btnTelefono!!.text.toString())
+        }
+        ///disparar llamada a celular
+        Example.btnTelefono?.setOnClickListener {
+            //llamar al telefono
+            println("llamar:" + telefono)
+            callToNumber("57" + Example.btnTelefono!!.text.toString())
         }
 
         locationDisplay = mapView2!!.locationDisplay
@@ -304,40 +314,20 @@ class MainActivity : AppCompatActivity() {
     fun mostrarPopup(categoriaNombre: String, nombre: String, direccion: String, telefono: String) {
 //        setContentView(R.layout.activity_main)
         Example.cont?.visibility = View.VISIBLE
-        println("holas" + categoriaNombre + " d" + nombre)
+        //println("holas" + categoriaNombre + " d" + nombre)
 //        lblCategoria!!.text = categoriaNombre
         //this.lugarNb!!.text = nombre
         Example.lugarNb?.text = nombre
         Example.lblCategoria?.text = categoriaNombre
         Example.direccionLugar?.text = direccion
 
-        Example.btnTelefono?.text = "Llamar al: " + telefono
+        Example.btnTelefono?.text = telefono
 
 //        if(foto != null){
         //              Ion.with(fotoLugar).load(foto)
         //    }else{
         //      Ion.with(fotoLugar).load("http://geoapps.esri.co/recursos/CCU2017/bogota.jpg")
         //}
-
-
-        ///disparar Whatsapp
-
-
-        Example.btnWhatsapp?.setOnClickListener {
-            //dispara whatsapp
-            println("wp:" + telefono)
-            MainActivity().sendMessageToWhatsAppContact("57" + telefono!!)
-        }
-        ///disparar llamada a celular
-        Example.btnTelefono?.setOnClickListener {
-            //llamar al telefono
-            println("llamar:" + telefono)
-            MainActivity().callToNumber("57" + Example.btnTelefono!!.text.toString())
-        }
-
-
-        //this.cont?.visibility = View.VISIBLE
-        //popup.setVisibility(View.VISIBLE)
 
     }
 
@@ -452,7 +442,7 @@ class MainActivity : AppCompatActivity() {
         val packageManager = this.getPackageManager()
         val i = Intent(Intent.ACTION_VIEW)
         try {
-            val url = "https://api.whatsapp.com/send?phone=" + number + "&text=" + URLEncoder.encode("holas", "UTF-8")
+            val url = "https://api.whatsapp.com/send?phone=" + number + "&text=" + URLEncoder.encode("Hola, Buen día", "UTF-8")
             i.setPackage("com.whatsapp")
             i.data = Uri.parse(url)
             if (i.resolveActivity(packageManager) != null) {
