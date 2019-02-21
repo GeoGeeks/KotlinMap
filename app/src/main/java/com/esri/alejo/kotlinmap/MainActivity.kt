@@ -23,6 +23,8 @@ import com.esri.alejo.kotlinmap.MainActivity.Example.Companion
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment
 import com.esri.arcgisruntime.data.Feature
 import com.esri.arcgisruntime.layers.LayerContent
+import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent
+import com.esri.arcgisruntime.loadable.LoadStatusChangedListener
 import com.esri.arcgisruntime.mapping.LayerList
 import java.util.concurrent.ExecutionException
 import java.net.URLEncoder
@@ -142,24 +144,34 @@ class MainActivity : AppCompatActivity() {
         map = ArcGISMap("http://geogeeks2.maps.arcgis.com/home/item.html?id=b120d5eeb44448e9a43f508850caa890")
         //val map = ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100, -74.0817500, 16)
 
-        Example.layers = map!!.operationalLayers
-        println("capas"+Example.layers)
-        println(message = "isemprty"+Example.layers!!.isEmpty())
-        println(message = "isnotempty"+Example.layers!!.isNotEmpty())
-        println(message = "tamaño"+Example.layers!!.size)
-        if(Example.layers!!.isNotEmpty()==true){
-            println("entra")
-            Example.ensayaderos = Example.layers!![0] as FeatureLayer?
-            println("ensayaderosprueba"+Example.ensayaderos)
-            Example.tiendasMusica = Example.layers!![1] as FeatureLayer?
-            println("tiendasmusica prueba"+Example.tiendasMusica)
-            //restaurantes = (FeatureLayer) layers.get(1)
-            //hoteles = (FeatureLayer) layers.get(2)
-        }
         println("sigue derecho")
         // set the map to be displayed in the layout's MapView
         mapView2!!.map = map
+
+        map!!.addLoadStatusChangedListener {
+            val mapLoadStatus: String
+            mapLoadStatus = map!!.loadStatus.name
+            println("mapload"+mapLoadStatus)
+            if(mapLoadStatus.equals("LOADED")){
+                Example.layers = mapView2.map.operationalLayers
+                println(Example.layers!!.toArray().lastIndex)
+                println("capas "+Example.layers)
+                println(message = "isemprty"+Example.layers!!.isEmpty())
+                println(message = "isnotempty"+Example.layers!!.isNotEmpty())
+                println(message = "tamaño"+Example.layers!!.size)
+                if(Example.layers!!.isEmpty()==false){
+                    println("entra")
+                    Example.ensayaderos = Example.layers!![0] as FeatureLayer?
+                    println("ensayaderosprueba"+Example.ensayaderos)
+                    Example.tiendasMusica = Example.layers!![1] as FeatureLayer?
+                    println("tiendasmusica prueba"+Example.tiendasMusica)
+                    //restaurantes = (FeatureLayer) layers.get(1)
+                    //hoteles = (FeatureLayer) layers.get(2)
+                }
+            }
+        }
         // get the MapView's LocationDisplay
+        println("sigue derecho 2")
 
         btnEnsayaderos!!.setOnClickListener {
             println("ensayaderos apagar")
@@ -314,13 +326,13 @@ class MainActivity : AppCompatActivity() {
         Example.btnWhatsapp?.setOnClickListener {
             //dispara whatsapp
             println("wp:" + telefono)
-            sendMessageToWhatsAppContact("57" + telefono!!)
+            MainActivity().sendMessageToWhatsAppContact("57" + telefono!!)
         }
         ///disparar llamada a celular
         Example.btnTelefono?.setOnClickListener {
             //llamar al telefono
             println("llamar:" + telefono)
-            callToNumber("57" + Example.btnTelefono!!.text.toString())
+            MainActivity().callToNumber("57" + Example.btnTelefono!!.text.toString())
         }
 
 
@@ -436,7 +448,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun sendMessageToWhatsAppContact(number: String) {
+    public fun sendMessageToWhatsAppContact(number: String) {
         val packageManager = this.getPackageManager()
         val i = Intent(Intent.ACTION_VIEW)
         try {
@@ -452,7 +464,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun callToNumber(number: String) {
+    public fun callToNumber(number: String) {
     // If an error is found, handle the failure to start.
     // Check permissions to see if failure may be due to lack of permissions.
         val permissionCheck3 = ContextCompat.checkSelfPermission(this@MainActivity, reqPermissions[2]) ==
@@ -470,8 +482,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun activarDesactivaLayer(layer: FeatureLayer, button: Button?){
-        println("layer" + layer)
-        println("button" + button)
+        //println("layer" + layer)
+        //println("button" + button)
         if(layer != null){
             if(button!!.isSelected){
                 //button.setSelected(false)
