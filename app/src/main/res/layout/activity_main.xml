@@ -149,6 +149,7 @@
                                 android:layout_weight="0.1"
                                 android:background="@drawable/arcgisruntime_mapview_esribanner_bgcolor"
                                 app:srcCompat="@mipmap/ic_launcher_foreground" />
+
                         </LinearLayout>
 
                     </LinearLayout>

@@ -116,27 +116,8 @@ class MainActivity : AppCompatActivity() {
         Example.btnTiendasMusica = findViewById(R.id.btnTiendasMusica) as Button
 
 
-        //Example.lugarNb?.text = "Holas"
-        //Example.C_ID= "asd"
-        //btnTelefono?.text = "573107746702"
-        //btnTelefono?.setOnClickListener {
-        //llamar al telefono
-        //    callToNumber(btnTelefono?.text.toString())
-        //}
-        //btnWhatsapp.setOnClickListener{
-        //dispara whatsapp
-        //    sendMessageToWhatsAppContact("573107746702");
-        //}
-
-
         mbut = findViewById(R.id.myLocationButton) as ImageButton
         Example.cont = findViewById(R.id.contentPopup) as LinearLayout
-        //lugarNb = findViewById(R.id.lugarNombre) as TextView
-
-        //  lugarNb?.text = "asdasd"
-        //    val str: String = lugarNb?.text.toString()
-
-        //  println("the value is $str")
 
 
         //navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -425,10 +406,10 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            "TiendasMusicaB" -> {
+            "TiendasMusicaC" -> {
                 nombre = feature?.attributes!!.get(nom).toString()
                 direccion = feature?.attributes!!.get(dir).toString()
-                telefono = feature?.attributes!!.get(tel).toString()
+                telefono = feature?.attributes!!.get(telR).toString()
                 foto = feature?.attributes!!.get(fot).toString()
                 MainActivity().mostrarPopup("Tienda de Música", nombre!!, direccion!!, telefono!!)
             }
